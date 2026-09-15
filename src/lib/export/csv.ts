@@ -38,5 +38,5 @@ export async function buildCsv({ options, selection, onProgress, checkpoint }: E
   }
   onProgress(1);
   // BOM so Excel opens the file as UTF-8.
-  return new Blob(["﻿", lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  return new Blob(["\uFEFF", lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
 }

@@ -215,7 +215,7 @@ function FileOutput({ options, selection }: { options: ExportOptions; selection:
       .build({ options, selection: sample, generatedAt: new Date(), onProgress: () => {}, checkpoint: async () => {} })
       .then((blob) => blob.text())
       .then((value) => {
-        if (!cancelled) setText(value.replace(/^﻿/, ""));
+        if (!cancelled) setText(value.replace(/^\uFEFF/, ""));
       });
     return () => {
       cancelled = true;
