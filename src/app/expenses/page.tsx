@@ -3,6 +3,7 @@
 import { Download, SearchX, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
+import { useExportDialog } from "@/components/export/ExportProvider";
 import { ExpenseFiltersBar } from "@/components/ExpenseFiltersBar";
 import { ExpenseRow } from "@/components/ExpenseRow";
 import { Modal } from "@/components/ui/Modal";
@@ -10,15 +11,22 @@ import { ListSkeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { useExpenses } from "@/hooks/useExpenses";
 import { sum } from "@/lib/analytics";
-import { downloadCsv } from "@/lib/csv";
-import { applyFilters, countActiveFilters, DEFAULT_FILTERS, type ExpenseFilters } from "@/lib/filters";
+import {
+  applyFilters,
+  countActiveFilters,
+  DEFAULT_FILTERS,
+  resolveDateRange,
+  type ExpenseFilters,
+} from "@/lib/filters";
 import { formatCurrency } from "@/lib/format";
+import { CATEGORIES } from "@/lib/types";
 
 const PAGE_SIZE = 50;
 
 export default function ExpensesPage() {
   const { expenses, isLoaded, clearAll } = useExpenses();
   const toast = useToast();
+  const { openExport } = useExportDialog();
   const [filters, setFilters] = useState<ExpenseFilters>(DEFAULT_FILTERS);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [confirmClear, setConfirmClear] = useState(false);
@@ -32,13 +40,15 @@ export default function ExpensesPage() {
     setVisible(PAGE_SIZE);
   };
 
-  const exportCsv = () => {
-    try {
-      downloadCsv(filtered);
-      toast(`Exported ${filtered.length} expense${filtered.length === 1 ? "" : "s"} to CSV.`);
-    } catch {
-      toast("Export failed. Please try again.", { variant: "error" });
-    }
+  // Start the export from what the list is showing; search text has no export equivalent, so it isn't carried over.
+  const exportCurrentView = () => {
+    const { from = "", to = "" } = resolveDateRange(filters);
+    openExport({
+      from,
+      to,
+      categories: filters.category === "all" ? [...CATEGORIES] : [filters.category],
+      sort: filters.sort,
+    });
   };
 
   const handleClearAll = () => {
@@ -57,9 +67,9 @@ export default function ExpensesPage() {
         </div>
         {isLoaded && expenses.length > 0 && (
           <div className="flex gap-2">
-            <button type="button" className="btn-secondary" onClick={exportCsv} disabled={filtered.length === 0}>
+            <button type="button" className="btn-secondary" onClick={exportCurrentView}>
               <Download className="h-4 w-4" aria-hidden />
-              Export CSV
+              Export view…
             </button>
             <button
               type="button"
@@ -141,7 +151,7 @@ export default function ExpensesPage() {
         description="This permanently removes every expense stored in this browser."
       >
         <p className="text-sm text-ink-2">
-          Consider exporting a CSV backup first. This action can&apos;t be undone.
+          Consider exporting a backup first. This action can&apos;t be undone.
         </p>
         <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button type="button" className="btn-secondary" onClick={() => setConfirmClear(false)} data-autofocus>

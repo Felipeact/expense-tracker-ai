@@ -1,11 +1,12 @@
 "use client";
 
-import { AlertTriangle, LayoutDashboard, ListOrdered, Plus, Wallet, X } from "lucide-react";
+import { AlertTriangle, Download, LayoutDashboard, ListOrdered, Plus, Wallet, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { ExpensesProvider, useExpenses } from "@/hooks/useExpenses";
 import { ExpenseDialogProvider, useExpenseDialog } from "./ExpenseDialogProvider";
+import { ExportProvider, useExportDialog } from "./export/ExportProvider";
 import { ToastProvider } from "./ui/Toast";
 
 const NAV = [
@@ -18,14 +19,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     <ToastProvider>
       <ExpensesProvider>
         <ExpenseDialogProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <StorageErrorBanner />
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pb-12 lg:pt-8">
-              {children}
-            </main>
-            <MobileNav />
-          </div>
+          <ExportProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <StorageErrorBanner />
+              <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pb-12 lg:pt-8">
+                {children}
+              </main>
+              <MobileNav />
+            </div>
+          </ExportProvider>
         </ExpenseDialogProvider>
       </ExpensesProvider>
     </ToastProvider>
@@ -35,6 +38,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 function Header() {
   const pathname = usePathname();
   const { openAdd } = useExpenseDialog();
+  const { openExport } = useExportDialog();
+  const { expenses, isLoaded } = useExpenses();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-surface/85 backdrop-blur">
@@ -65,11 +70,19 @@ function Header() {
           })}
         </nav>
 
-        <button type="button" onClick={openAdd} className="btn-primary ml-auto">
-          <Plus className="h-4 w-4" aria-hidden />
-          <span className="hidden sm:inline">Add expense</span>
-          <span className="sm:hidden">Add</span>
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          {isLoaded && expenses.length > 0 && (
+            <button type="button" onClick={() => openExport()} className="btn-secondary" aria-label="Export data">
+              <Download className="h-4 w-4" aria-hidden />
+              <span className="hidden sm:inline">Export</span>
+            </button>
+          )}
+          <button type="button" onClick={openAdd} className="btn-primary">
+            <Plus className="h-4 w-4" aria-hidden />
+            <span className="hidden sm:inline">Add expense</span>
+            <span className="sm:hidden">Add</span>
+          </button>
+        </div>
       </div>
     </header>
   );

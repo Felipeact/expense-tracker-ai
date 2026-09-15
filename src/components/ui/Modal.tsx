@@ -9,11 +9,15 @@ interface ModalProps {
   title: string;
   description?: string;
   children: ReactNode;
+  /** "xl" is a wide, fixed-height workspace dialog. */
+  size?: "md" | "xl";
+  /** Removes body padding so children can lay out edge to edge. */
+  flush?: boolean;
 }
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function Modal({ open, onClose, title, description, children }: ModalProps) {
+export function Modal({ open, onClose, title, description, children, size = "md", flush = false }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -70,9 +74,11 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
-        className="relative max-h-[92vh] w-full animate-slide-up overflow-y-auto rounded-t-2xl border border-line bg-surface shadow-pop sm:max-w-lg sm:rounded-2xl"
+        className={`relative flex max-h-[92vh] w-full animate-slide-up flex-col overflow-hidden rounded-t-2xl border border-line bg-surface shadow-pop sm:rounded-2xl ${
+          size === "xl" ? "h-[92vh] sm:h-[min(880px,calc(100vh-10rem))] sm:max-w-6xl" : "sm:max-w-lg"
+        }`}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
           <div>
             <h2 id={titleId} className="text-lg font-semibold text-ink">
               {title}
@@ -87,7 +93,7 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="px-5 py-5 sm:px-6">{children}</div>
+        <div className={`min-h-0 flex-1 overflow-y-auto ${flush ? "" : "px-5 py-5 sm:px-6"}`}>{children}</div>
       </div>
     </div>
   );

@@ -83,11 +83,15 @@ export function applyFilters(expenses: Expense[], filters: ExpenseFilters): Expe
     return true;
   });
 
-  const byNewest = (a: Expense, b: Expense) =>
-    b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt);
+  return sortExpenses(result, filters.sort);
+}
 
-  return result.sort((a, b) => {
-    switch (filters.sort) {
+const byNewest = (a: Expense, b: Expense) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt);
+
+/** Sorts in place and returns the same array. */
+export function sortExpenses(expenses: Expense[], order: SortOrder): Expense[] {
+  return expenses.sort((a, b) => {
+    switch (order) {
       case "date-asc":
         return -byNewest(a, b);
       case "amount-desc":
