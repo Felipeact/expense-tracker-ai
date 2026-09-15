@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CategoryBreakdown } from "@/components/charts/CategoryBreakdown";
@@ -12,6 +12,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { DashboardSkeleton } from "@/components/ui/Skeleton";
 import { useExpenses } from "@/hooks/useExpenses";
 import { PERIODS, summarize, trend, type Period } from "@/lib/analytics";
+import { downloadCsv } from "@/lib/csv";
 
 const TREND_COPY: Record<Period, { subtitle: string; labelWidth: number }> = {
   "this-month": { subtitle: "Daily totals this month", labelWidth: 22 },
@@ -45,12 +46,18 @@ export default function DashboardPage() {
           <p className="mt-1 text-sm text-ink-2">An overview of where your money is going.</p>
         </div>
         {expenses.length > 0 && (
-          <SegmentedControl
-            label="Time period"
-            value={period}
-            onChange={setPeriod}
-            options={PERIODS.map(({ value, label }) => ({ value, label }))}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <SegmentedControl
+              label="Time period"
+              value={period}
+              onChange={setPeriod}
+              options={PERIODS.map(({ value, label }) => ({ value, label }))}
+            />
+            <button type="button" className="btn-secondary" onClick={() => downloadCsv(expenses)}>
+              <Download className="h-4 w-4" aria-hidden />
+              Export Data
+            </button>
+          </div>
         )}
       </div>
 
