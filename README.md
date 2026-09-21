@@ -1,51 +1,39 @@
-# Spendwise — Expense Tracker
+# Spendwise — CSV Export Branch
 
-A personal expense tracker built with Next.js 14 (App Router), TypeScript, and Tailwind CSS. Data is stored in your browser's `localStorage`.
+This branch focuses on the first export iteration for Spendwise. The app keeps its core expense tracking features, while adding a clearer export flow so users can send their current filtered data out of the app.
 
-## Features
+## Highlights
 
-- **Add, edit, and delete expenses.** Each expense has a date, amount, category, and description. The form is validated, and a deleted expense can be restored with **Undo**.
-- **Dashboard.** Pick a period (this month, last 90 days, this year, or all time) to see:
-  - Total spent, compared with the previous period
-  - Daily average, number of transactions, and top category
-  - A chart of spending over time (daily, weekly, or monthly bars depending on the period), with hover and keyboard tooltips and a table view
-  - A breakdown by category showing amounts and each category's share
-  - Your 5 most recent expenses
-- **Expense list.** Search it, filter by category or date (with presets or a custom range), and sort by date or amount.
-- **CSV export** of the expenses currently shown in the list.
-- **Themes and layout.** Light and dark mode follow your system setting. On mobile, navigation moves to a bottom bar.
-- **Loading and errors.** Skeletons show while data loads. If storage is corrupted or full, a banner explains what happened, and each field shows its own validation error.
-- **Multi-tab sync.** Changes made in one browser tab show up in your other open tabs.
+- Add, edit, and delete expenses
+- Dashboard summaries and category insights
+- Search, filter, and sort the expense list
+- Export the current list to CSV
+- Responsive layout and local storage persistence
+
+## Feature focus
+
+The main value of this branch is the export workflow:
+
+- users can export the list they are currently viewing
+- export respects the current filters and selected view
+- CSV output is designed for quick spreadsheet analysis or sharing
 
 ## Getting started
 
-Requires Node.js 18.17 or later.
-
 ```bash
 npm install
-npm run dev        # http://localhost:3000
+npm run dev
 ```
 
-For a production build:
+Then open http://localhost:3000.
 
-```bash
-npm run build
-npm start
-```
+## Typical workflow
 
-Other scripts: `npm run lint` and `npm run typecheck`.
+1. Open the dashboard or expense list
+2. Apply filters or sorting
+3. Use the export action to generate CSV output
+4. Open the file in Excel, Google Sheets, or another spreadsheet tool
 
-## Project structure
+## Branch purpose
 
-```
-src/
-  app/                  Routes: dashboard (/), expenses (/expenses), error and 404 pages
-  components/           UI: AppShell, ExpenseForm, ExpenseRow, filters, dialogs
-    charts/             TrendChart, CategoryBreakdown (plain HTML/CSS, no chart library)
-    dashboard/          Stat cards
-    ui/                 Modal, Toast, SegmentedControl, Skeleton
-  hooks/                useExpenses (state + persistence), useElementWidth
-  lib/                  Pure logic: types, validation, filters, analytics, dates, CSV, storage
-```
-
-Dates are stored as local `YYYY-MM-DD` strings, and totals are summed in integer cents. This avoids time-zone shifts and floating-point rounding errors.
+This is the earliest export-focused branch in the repo and serves as a baseline for later export enhancements.
